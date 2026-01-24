@@ -1,19 +1,11 @@
-/* === This file is part of Calamares - <http://github.com/calamares> ===
+/* === This file is part of Calamares - <https://calamares.io> ===
  *
- *   Copyright 2015, Teo Mrnjavac <teo@kde.org>
- *   Copyright 2018, Jonathan Carter <jcc@debian.org>
+ *   SPDX-FileCopyrightText: 2015 Teo Mrnjavac <teo@kde.org>
+ *   SPDX-FileCopyrightText: 2018 Adriaan de Groot <groot@kde.org>
+ *   SPDX-License-Identifier: GPL-3.0-or-later
  *
- *   Calamares is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, or (at your option) any later version.
+ *   Calamares is Free Software: see the License-Identifier above.
  *
- *   Calamares is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with Calamares. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import QtQuick 2.0;
@@ -23,29 +15,60 @@ Presentation
 {
     id: presentation
 
+    function nextSlide() {
+        console.log("QML Component (default slideshow) Next slide");
+        presentation.goToNextSlide();
+    }
+
     Timer {
-        interval: 20000
+        id: advanceTimer
+        interval: 1000
+        running: presentation.activatedInCalamares
         repeat: true
-        onTriggered: presentation.goToNextSlide()
+        onTriggered: nextSlide()
     }
 
     Slide {
+
         Image {
-            id: background1
-            source: "slide.png"
-            width: 400; height: 300
+            id: background
+            source: "squid.png"
+            width: 200; height: 200
             fillMode: Image.PreserveAspectFit
             anchors.centerIn: parent
         }
         Text {
-            anchors.horizontalCenter: background1.horizontalCenter
-            anchors.top: background1.bottom
-            text: qsTr("<strong>Installing Greemond Linux</strong><br/><br/>"+
-                  "Copying the system files. This might take a few minutes.")
+            anchors.horizontalCenter: background.horizontalCenter
+            anchors.top: background.bottom
+            text: "Installing Greemond Linux<br/>"
             wrapMode: Text.WordWrap
-            width: 600
+            width: presentation.width
             horizontalAlignment: Text.Center
         }
+    }
+
+    Slide {
+        centeredText: qsTr("To keep your system updated, run this command in a shell:<br>"+
+                       "# zypper dup")
+    }
+
+    Slide {
+        centeredText: qsTr("If you like this project, please consider donating.")
+    }
+
+    // When this slideshow is loaded as a V1 slideshow, only
+    // activatedInCalamares is set, which starts the timer (see above).
+    //
+    // In V2, also the onActivate() and onLeave() methods are called.
+    // These example functions log a message (and re-start the slides
+    // from the first).
+    function onActivate() {
+        console.log("QML Component (default slideshow) activated");
+        presentation.currentSlide = 0;
+    }
+
+    function onLeave() {
+        console.log("QML Component (default slideshow) deactivated");
     }
 
 }
